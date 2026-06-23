@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS 6.0 · 60 ngày — Tracker (v2, chỉ đường chi tiết)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF8; --card:#FFFFFF; --ink:#14142B; --ink-soft:#52526B; --ink-faint:#8A8AA0;
+    --line:#ECE8E0; --line-strong:#DED9CF;
+    --teal:#0E8C77; --teal-deep:#0B6E5D; --teal-soft:#DBEEE9;
+    --amber:#E0922F; --amber-soft:#FBEBD3;
+    --p1:#5B6BC0; --p1-soft:#E4E7F6; --p2:#0E8C77; --p2-soft:#DBEEE9; --p3:#C2632F; --p3-soft:#F6E5D8;
+    --shadow:0 1px 2px rgba(20,20,43,.04), 0 8px 24px rgba(20,20,43,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Be Vietnam Pro',system-ui,sans-serif;font-size:16px;line-height:1.5;padding:18px 14px 64px}
+  .mono{font-family:'Space Mono',monospace}
+  .wrap{max-width:680px;margin:0 auto}
+  a{color:inherit}
+
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+  .brand h1{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0;line-height:1.1}
+  .brand p{margin:3px 0 0;font-size:12.5px;color:var(--ink-faint);font-weight:500}
+  .stats{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .ring{position:relative;width:54px;height:54px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+  .ring .pct small{font-size:8px;font-weight:600;color:var(--ink-faint);letter-spacing:.04em}
+  .streak{text-align:center}
+  .streak .num{font-weight:800;font-size:19px;line-height:1}
+  .streak .lab{font-size:9.5px;color:var(--ink-faint);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+
+  .meter{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px 10px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .meter-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .meter-head .t{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+  .meter-head .v{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--teal-deep)}
+  .scale{position:relative;height:30px}
+  .track{position:absolute;top:11px;left:0;right:0;height:8px;background:var(--line);border-radius:6px}
+  .fill{position:absolute;top:11px;left:0;height:8px;background:linear-gradient(90deg,var(--p1),var(--p2));border-radius:6px;transition:width .4s ease}
+  .goal{position:absolute;top:5px;width:2px;height:20px;background:var(--amber)}
+  .goal::after{content:'6.0';position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--amber)}
+  .ticks{position:absolute;top:22px;left:0;right:0;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9px;color:var(--ink-faint)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+  .card-top{padding:16px 18px 14px;border-bottom:1px solid var(--line);position:relative}
+  .daynum{display:flex;align-items:baseline;gap:10px}
+  .daynum .big{font-family:'Space Mono',monospace;font-size:40px;font-weight:700;line-height:.9;letter-spacing:-.03em}
+  .daynum .of{font-size:13px;color:var(--ink-faint);font-weight:600}
+  .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .date{font-size:13px;color:var(--ink-soft);font-weight:600}
+  .pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+  .pill.phase1{background:var(--p1-soft);color:var(--p1)} .pill.phase2{background:var(--p2-soft);color:var(--teal-deep)} .pill.phase3{background:var(--p3-soft);color:var(--p3)}
+  .pill.type-light{background:#EEF4EC;color:#5a8a52} .pill.type-mock,.pill.type-milestone{background:var(--amber-soft);color:#9a5e10} .pill.type-study{background:#F0EFEA;color:var(--ink-soft)}
+  .star{position:absolute;top:16px;right:18px;font-size:18px}
+  .focus{font-size:18px;font-weight:700;letter-spacing:-.01em;margin-top:12px;line-height:1.25}
+
+  .card-body{padding:14px 18px 18px}
+  .tasks{list-style:none;margin:0 0 4px;padding:0;display:flex;flex-direction:column;gap:14px}
+  .task{display:flex;gap:11px;align-items:flex-start}
+  .cb{flex-shrink:0;width:22px;height:22px;border:2px solid var(--line-strong);border-radius:7px;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;background:#fff}
+  .cb:hover{border-color:var(--teal)} .cb.on{background:var(--teal);border-color:var(--teal)} .cb.on::after{content:'✓';color:#fff;font-size:13px;font-weight:800}
+  .task-main{flex:1;min-width:0}
+  .task-txt{font-size:14.5px;line-height:1.45}
+  .task.done .task-txt{color:var(--ink-faint);text-decoration:line-through}
+  .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .lnk{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:8px;text-decoration:none;background:var(--teal-soft);color:var(--teal-deep);transition:.15s}
+  .lnk:hover{background:var(--teal);color:#fff}
+  .lnk::after{content:'↗';font-size:10px;opacity:.7}
+  .lnk.note{background:#F3F1EB;color:var(--ink-soft);cursor:default} .lnk.note::after{content:''}
+  .navnote{margin-top:7px;display:flex;flex-direction:column;gap:5px}
+  .navline{font-size:11.5px;color:var(--ink-soft);line-height:1.45;background:var(--paper);border-left:2.5px solid var(--line-strong);padding:5px 9px;border-radius:0 7px 7px 0}
+  .navline b{color:var(--ink);font-weight:700}
+  .navline .tag{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--teal-deep);text-transform:uppercase;letter-spacing:.03em}
+
+  .measure{margin-top:16px;background:var(--amber-soft);border-radius:10px;padding:10px 12px;display:flex;gap:9px;align-items:flex-start}
+  .measure .ic{font-size:14px;margin-top:1px}
+  .measure .mtxt{font-size:13px;font-weight:600;color:#7a4a08}
+  .measure .mtxt b{font-weight:800}
+
+  .mock{margin-top:14px;border:1.5px dashed var(--amber);border-radius:12px;padding:13px 14px;background:#fffdf9}
+  .mock h4{margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#9a5e10}
+  .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mfield label{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);margin-bottom:3px}
+  .mfield input{width:100%;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;padding:7px 9px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;color:var(--ink)}
+  .mfield input:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+  .mfield .band{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--teal-deep);margin-top:3px;min-height:14px}
+  .overall{margin-top:11px;display:flex;align-items:center;justify-content:space-between;background:var(--teal-soft);border-radius:9px;padding:8px 12px}
+  .overall .l{font-size:12px;font-weight:700;color:var(--teal-deep)} .overall .r{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--teal-deep)}
+
+  .notes{margin-top:14px}
+  .notes label{font-size:11px;font-weight:700;color:var(--ink-faint);letter-spacing:.04em;text-transform:uppercase}
+  .notes textarea{width:100%;margin-top:5px;min-height:54px;resize:vertical;font-family:'Be Vietnam Pro',sans-serif;font-size:13.5px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+  .notes textarea:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+
+  .card-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .btn{flex:1;min-width:140px;border:none;border-radius:11px;padding:13px 14px;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;transition:.15s}
+  .btn-done{background:var(--teal);color:#fff} .btn-done:hover{background:var(--teal-deep)} .btn-done.is-done{background:var(--teal-soft);color:var(--teal-deep)}
+  .btn-min{flex:0 0 auto;min-width:0;background:transparent;color:var(--ink-soft);border:1px solid var(--line-strong)} .btn-min:hover{border-color:var(--ink-soft)} .btn-min.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+  .nav button{background:var(--card);border:1px solid var(--line-strong);border-radius:11px;padding:11px 14px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;color:var(--ink);transition:.15s}
+  .nav button:hover:not(:disabled){border-color:var(--teal);color:var(--teal-deep)} .nav button:disabled{opacity:.35;cursor:default}
+  .nav .today{flex:1;background:var(--ink);color:#fff;border-color:var(--ink)} .nav .today:hover{background:#000}
+
+  .toggle{display:block;width:100%;margin-top:12px;background:transparent;border:1px dashed var(--line-strong);border-radius:11px;padding:10px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer}
+  .toggle:hover{border-color:var(--ink-faint)}
+  .grid{display:none;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:12px}
+  .grid.show{display:grid}
+  .cell{aspect-ratio:1;border-radius:7px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;color:var(--ink-soft);background:#fff;position:relative;transition:.12s}
+  .cell:hover{transform:scale(1.08);z-index:2;box-shadow:var(--shadow)}
+  .cell.p1{border-color:var(--p1-soft)} .cell.p2{border-color:var(--p2-soft)} .cell.p3{border-color:var(--p3-soft)}
+  .cell.done.p1{background:var(--p1);color:#fff;border-color:var(--p1)} .cell.done.p2{background:var(--p2);color:#fff;border-color:var(--p2)} .cell.done.p3{background:var(--p3);color:#fff;border-color:var(--p3)}
+  .cell.cur{outline:2.5px solid var(--ink);outline-offset:1px}
+  .cell .dot{position:absolute;top:2px;right:3px;font-size:8px;color:var(--amber)} .cell.done .dot{color:#fff}
+
+  .panel{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;box-shadow:var(--shadow);display:none;overflow:hidden}
+  .panel.show{display:block}
+  .resrow{padding:11px 14px;border-top:1px solid var(--line)}
+  .resrow:first-child{border-top:none}
+  .resrow .rh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .resrow .rh .lnk{margin:0}
+  .resrow .rn{font-size:11.5px;color:var(--ink-soft);line-height:1.45;margin-top:6px}
+  .resrow .rn b{color:var(--ink)}
+
+  .mocklog{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);display:none}
+  .mocklog.show{display:block}
+  .mocklog h3{margin:0 0 9px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+  .mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px}
+  .mrow:first-of-type{border-top:none}
+  .mrow .who{font-weight:700} .mrow .who small{display:block;color:var(--ink-faint);font-weight:500;font-size:10.5px}
+  .mrow .scores{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--ink-soft)}
+  .mrow .ov{font-family:'Space Mono',monospace;font-weight:700;font-size:16px;color:var(--teal-deep)}
+
+  .foot{text-align:center;margin-top:22px;font-size:11px;color:var(--ink-faint)}
+  .foot a{color:var(--ink-faint);cursor:pointer;text-decoration:underline}
+
+  .min .tasks .task:not(:first-child){display:none}
+  .min .mock,.min .notes,.min .mocklog{display:none}
+
+  @media(max-width:480px){.daynum .big{font-size:34px}.focus{font-size:16.5px}.grid{grid-template-columns:repeat(6,1fr)}.stats{gap:9px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <h1>IELTS 6.0 — 60 ngày</h1>
+      <p class="mono">15/6 → 13/8/2026 · mỗi link chỉ thẳng tới đúng trang + làm gì</p>
+    </div>
+    <div class="stats">
+      <div class="streak"><div class="num" id="streakNum">0</div><div class="lab">🔥 chuỗi</div></div>
+      <div class="ring">
+        <svg width="54" height="54" viewBox="0 0 54 54">
+          <circle cx="27" cy="27" r="23" fill="none" stroke="var(--line)" stroke-width="6"/>
+          <circle id="ringFill" cx="27" cy="27" r="23" fill="none" stroke="var(--teal)" stroke-width="6" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="144.5"/>
+        </svg>
+        <div class="pct"><span id="ringPct">0%</span><small id="ringDone">0/60</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="meter">
+    <div class="meter-head"><span class="t">Band gần nhất</span><span class="v" id="meterVal">— chưa có mock</span></div>
+    <div class="scale">
+      <div class="track"></div><div class="fill" id="meterFill" style="width:0%"></div>
+      <div class="goal" style="left:66.6%"></div>
+      <div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+    </div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="card-top">
+      <div class="star" id="star"></div>
+      <div class="daynum"><span class="big mono" id="dBig">1</span><span class="of">/ 60</span></div>
+      <div class="meta"><span class="date mono" id="dDate"></span><span class="pill" id="dPhase"></span><span class="pill" id="dType"></span></div>
+      <div class="focus" id="dFocus"></div>
+    </div>
+    <div class="card-body">
+      <ul class="tasks" id="dTasks"></ul>
+      <div class="measure"><span class="ic">📏</span><div class="mtxt" id="dMeasure"></div></div>
+      <div id="mockSlot"></div>
+      <div class="notes"><label>Ghi chú / "lỗi của tao"</label><textarea id="dNotes" placeholder="Câu nào sai, vì sao, lần sau làm sao…"></textarea></div>
+      <div class="card-actions">
+        <button class="btn btn-done" id="doneBtn">Đánh dấu xong ngày</button>
+        <button class="btn btn-min" id="minBtn" title="Chỉ hiện việc quan trọng nhất">⚡ Chế độ nhẹ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button id="prevBtn">← Hôm trước</button>
+    <button class="today" id="todayBtn">Về hôm nay</button>
+    <button id="nextBtn">Ngày sau →</button>
+  </div>
+
+  <button class="toggle" id="gridToggle">▦ Xem toàn bộ 60 ngày</button>
+  <div class="grid" id="grid"></div>
+
+  <button class="toggle" id="mapToggle">📍 Bản đồ nguồn — bấm link nào thì làm gì</button>
+  <div class="panel" id="resPanel"></div>
+
+  <div class="mocklog" id="mocklog"><h3>Lịch sử mock</h3><div id="mockRows"></div></div>
+
+  <div class="foot">Tự lưu trên máy này · <a id="resetBtn">Xoá toàn bộ tiến trình</a></div>
+</div>
+
+<script>
+/* ---------- resources: deep link + "tới nơi rồi làm gì" ---------- */
+const RES = {
+ 'BC-FULL':{l:'BC mock đầy đủ',u:'https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-english-practice-tests',nav:'Trang có 4 ô: Listening / Reading / Writing / Speaking. Làm lần lượt <b>L → R → W</b>. Mỗi phần bấm vào, cuối trang có nút tải đề + đáp án để tự chấm.'},
+ 'BC-LIST':{l:'BC Listening test',u:'https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-english-practice-tests/listening',nav:'Bấm bài "Listening practice test", nghe <b>1 lần duy nhất</b>, làm 40 câu, rồi tải answer sheet ở cuối để chấm + đọc transcript.'},
+ 'BC-READ':{l:'BC Reading test',u:'https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-english-practice-tests/reading',nav:'Chọn <b>Academic</b> → có Reading test 1 và test 2, mỗi test 3 section. Làm Section 1 trước. Nút "download the answers" ở cuối mỗi section.'},
+ 'BC-WRITE':{l:'BC Writing test',u:'https://takeielts.britishcouncil.org/take-ielts/prepare/free-ielts-english-practice-tests/writing',nav:'Chọn <b>Academic</b> → có đề Task 1 + Task 2 kèm bài mẫu band. Dùng đề ở đây để luyện.'},
+ 'BC-L-LE':{l:'BC LearnEnglish · nghe nền',u:'https://learnenglish.britishcouncil.org/skills/listening',nav:'Cuộn tới mục <b>B1 listening</b>. Mỗi bài: làm "Preparation" → nghe → Task 1 & Task 2 (trắc nghiệm) → mở transcript đọc lại.'},
+ 'LIZ-TFNG':{l:'Liz · True/False/NG (tips)',u:'https://ieltsliz.com/ielts-true-false-not-given-essential-tips/',nav:'Xem video đầu trang + đọc các bước. Đây là <b>lý thuyết</b> — làm xong qua trang luyện bên dưới.'},
+ 'LIZ-TFNG-P':{l:'Liz · TFNG luyện',u:'https://ieltsliz.com/true-false-not-given-ielts-reading-practice/',nav:'Có <b>4 bài free</b>. Làm bài 1 hôm nay. Sai chỗ nào → đọc giải thích trong phần comment ngay dưới bài.'},
+ 'LIZ-QTYPES':{l:'Liz · dạng câu Reading',u:'https://ieltsliz.com/ielts-reading-question-types/',nav:'Trang liệt kê mọi dạng câu + link luyện. Bấm đúng dạng ghi trong việc (<b>Matching Headings</b> / <b>Matching Information</b>).'},
+ 'LIZ-LISTEN':{l:'Liz · Listening',u:'https://ieltsliz.com/ielts-listening/',nav:'Cuộn xuống danh sách "practice lessons". Chọn đúng dạng câu ghi trong việc, làm bài + đọc tips trên trang đó.'},
+ 'LIZ-LMCQ':{l:'Liz · Listening MCQ',u:'https://ieltsliz.com/ielts-listening-multiple-choice-essential-tips/',nav:'Đọc tips rồi làm bài luyện multiple choice ngay trên trang. Nghe lại 2 lần phần sai.'},
+ 'LIZ-SP1':{l:'Liz · Speaking Part 1',u:'https://ieltsliz.com/ielts-speaking-part-1-topics/',nav:'Chọn 2–3 chủ đề (Food, Hobbies, Work…). Tự trả lời từng câu thành tiếng, <b>quay video</b> để nghe lại.'},
+ 'LIZ-SP2':{l:'Liz · Speaking Part 2',u:'https://ieltsliz.com/ielts-speaking-part-2-topics/',nav:'Chọn 1 cue card. 1’ chuẩn bị ý → nói <b>2’ liền mạch</b>, quay lại. Đừng học thuộc, chỉ chuẩn bị ý.'},
+ 'LIZ-SPEAK':{l:'Liz · Speaking (hub)',u:'https://ieltsliz.com/ielts-speaking-free-lessons-essential-tips/',nav:'Đọc cấu trúc 3 phần + 4 tiêu chí chấm. Link sang Part 1/2/3 topics ở trong trang.'},
+ 'LIZ-W1':{l:'Liz · Writing Task 1',u:'https://ieltsliz.com/ielts-writing-task-1-lessons-and-tips/',nav:'Đọc phần <b>structure</b> (overview + nhóm số liệu) + xem 1 model answer ngay trên trang.'},
+ 'LIZ-W2':{l:'Liz · Writing Task 2',u:'https://ieltsliz.com/ielts-writing-task-2/',nav:'Lấy <b>đề</b>: vào menu Topics → "100 Essay Questions". Cấu trúc + model band 9 nằm giữa trang này.'},
+ 'SIMON-T1':{l:'Simon · Writing T1',u:'https://ielts-simon.study/ielts-writing-task-1-academic/',nav:'Danh sách bài <b>đánh số 1,2,3…</b> Làm đúng số lesson ghi trong việc, theo thứ tự, đừng nhảy cóc.'},
+ 'SIMON-T2':{l:'Simon · Writing T2',u:'https://ielts-simon.study/ielts-writing-task-2/',nav:'Danh sách bài <b>đánh số</b>. Mở đúng số lesson ghi trong việc (vd #1–2), đọc + làm theo.'},
+ 'W&I':{l:'Write & Improve',u:'https://writeandimprove.com/free',nav:'Bấm "Get started" → ô tìm task chọn <b>IELTS</b> → dán bài viết → nút <b>Check</b>. Ra level CEFR + lỗi. Sửa rồi Check lại.'},
+ 'AWL':{l:'AWL · Quizlet',u:'https://quizlet.com/search?query=academic+word+list+sublist&type=sets',nav:'Mở 1 set "Academic Word List <b>Sublist N</b>" đúng số trong việc. Học chế độ Flashcards → rồi Test để kiểm tra.'},
+ 'italki':{l:'italki',u:'https://www.italki.com',nav:'Lọc <b>Community Tutor + English</b>, sort giá thấp. Đặt buổi 30–45’. Nhắn trước mục tiêu: "IELTS Speaking Part X" hoặc "sửa giúp essay này".'},
+ 'ELSA':{l:'ELSA (app)',note:1,nav:'Mở app → mục <b>Pronunciation</b> hoặc bài theo lộ trình → nói → xem % từng âm. Lặp âm dưới 80%.'},
+ 'Cam':{l:'Cambridge 16–19 (sách)',note:1,nav:'Mở <b>đúng Test/Section</b> ghi trong việc. Đáp án + transcript ở cuối sách. Chấm xong tra transcript phần nghe sai.'},
+ 'Dest':{l:'Destination B2 (sách)',note:1,nav:'Làm <b>đúng Unit</b> trong việc: Grammar trước, Vocabulary sau. Tự chấm bằng answer key cuối sách.'}
+};
+
+/* ---------- 60-day data ---------- */
+const D = [
+ {n:1,date:'T2 15/6',ph:1,type:'mock',mock:'diag',focus:'🎯 Diagnostic — đo band gốc',tasks:[{t:'Làm full mock L+R+W canh giờ thật (L 30’ · R 60’ · W 60’), ghi band từng kỹ năng.',c:['BC-FULL']}],m:'Có <b>4 band gốc</b>. Mốc 0 — đừng buồn nếu thấp.'},
+ {n:2,date:'T3 16/6',ph:1,type:'study',focus:'Listening — dạng 1 (form/note completion)',tasks:[{t:'Học cách làm dạng form/note completion.',c:['LIZ-LISTEN']},{t:'Làm Section 1, nghe lại transcript, gạch chỗ sai.',c:['BC-LIST']}],m:'Số đúng /10. Ghi các từ nghe trượt.'},
+ {n:3,date:'T4 17/6',ph:1,type:'study',focus:'Reading — dạng 1 (True/False/Not Given)',tasks:[{t:'Đọc lý thuyết T/F/NG (xem video + các bước).',c:['LIZ-TFNG']},{t:'Làm bài luyện TFNG #1.',c:['LIZ-TFNG-P']}],m:'TFNG đúng <b>≥5/7</b>.'},
+ {n:4,date:'T5 18/6',ph:1,type:'study',focus:'Writing Task 2 — dựng khung',tasks:[{t:'Làm lesson #1–2 (Position + Structure). Viết 1 intro + 1 outline 4 đoạn.',c:['SIMON-T2']}],m:'Có outline 4 đoạn rõ.'},
+ {n:5,date:'T6 19/6',ph:1,type:'study',focus:'Listening nền + ngữ pháp',tasks:[{t:'Làm 2 bài nghe nền (mục B1).',c:['BC-L-LE']},{t:'Unit 1 (Grammar).',c:['Dest']}],m:'2 bài đúng <b>≥70%</b>.'},
+ {n:6,date:'T7 20/6',ph:1,type:'study',focus:'Speaking Part 1',tasks:[{t:'Chọn 2–3 chủ đề, tự trả lời + quay video.',c:['LIZ-SP1']},{t:'Phát âm 15’.',c:['ELSA']}],m:'ELSA <b>≥75%</b>. Trôi 3 câu/câu hỏi.'},
+ {n:7,date:'CN 21/6',ph:1,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'10 từ Sublist 1.',c:['AWL']},{t:'Nghe 1 bài B1 bất kỳ.',c:['BC-L-LE']}],m:'Nhớ 8/10.'},
+
+ {n:8,date:'T2 22/6',ph:1,type:'study',focus:'Listening — dạng 2 (multiple choice)',tasks:[{t:'Học tips + làm bài MCQ.',c:['LIZ-LMCQ']},{t:'Làm Section 2.',c:['BC-LIST']},{t:'Ôn Sublist 1.',c:['AWL']}],m:'Đúng /10. AWL1 ≥80%.'},
+ {n:9,date:'T3 23/6',ph:1,type:'study',focus:'Reading — dạng 2 (matching headings)',tasks:[{t:'Bấm "Matching Headings", học + luyện 1 bài.',c:['LIZ-QTYPES']},{t:'Unit 2.',c:['Dest']}],m:'Matching headings <b>≥4/6</b>.'},
+ {n:10,date:'T4 24/6',ph:1,type:'study',focus:'Writing T2 — thân bài',tasks:[{t:'Lesson #3–5 (build paragraph, develop ideas). Viết 1 body paragraph.',c:['SIMON-T2']}],m:'Đoạn có: ý chính + giải thích + ví dụ.'},
+ {n:11,date:'T5 25/6',ph:1,type:'study',focus:'Writing — chấm máy lần đầu',tasks:[{t:'Lấy 1 đề Task 2 (mục 100 Essay Questions), viết hoàn chỉnh.',c:['LIZ-W2']},{t:'Dán vào, chọn IELTS, bấm Check.',c:['W&I']}],m:'W&I trả level (gốc thường A2–B1).'},
+ {n:12,date:'T6 26/6',ph:1,type:'study',focus:'Reading — timed',tasks:[{t:'2 section liên tiếp (Academic), canh 40’.',c:['BC-READ']},{t:'Sublist 2.',c:['AWL']}],m:'Đúng /26. Quen áp lực giờ.'},
+ {n:13,date:'T7 27/6',ph:1,type:'study',focus:'Speaking Part 2 + buổi italki #1',tasks:[{t:'Chọn 1 cue card → nói 2’ liền mạch, quay lại.',c:['LIZ-SP2']},{t:'Buổi #1 (Part 1+2).',c:['italki']}],m:'Tutor ghi band Speaking gốc.'},
+ {n:14,date:'CN 28/6',ph:1,type:'milestone',mock:'mini',focus:'🚩 Milestone — mini-test',tasks:[{t:'L 1 full test (40 câu).',c:['BC-LIST']},{t:'R 1 passage (Academic Section 1), canh giờ.',c:['BC-READ']}],m:'<b>So với D1.</b> L tăng ≥2 câu là ổn.'},
+
+ {n:15,date:'T2 29/6',ph:1,type:'study',focus:'Listening — dạng 3 (map/plan labelling)',tasks:[{t:'Tìm bài "map/plan" trong danh sách, học + luyện.',c:['LIZ-LISTEN']},{t:'Ôn Sublist 2.',c:['AWL']}],m:'Map <b>≥6/10</b>.'},
+ {n:16,date:'T3 30/6',ph:1,type:'study',focus:'Reading — dạng 3 (matching information)',tasks:[{t:'Bấm "Matching Information/Features", học + luyện 1 bài.',c:['LIZ-QTYPES']}],m:'Đúng /13.'},
+ {n:17,date:'T4 1/7',ph:1,type:'study',focus:'Writing Task 1 (Academic)',tasks:[{t:'Đọc structure + 1 model.',c:['LIZ-W1']},{t:'Làm lesson #1–3, viết 1 Task 1.',c:['SIMON-T1']}],m:'Có overview đúng + nhóm số liệu.'},
+ {n:18,date:'T5 2/7',ph:1,type:'study',focus:'Writing T1 — chấm',tasks:[{t:'Viết Task 1 thứ 2 → Check.',c:['W&I']},{t:'Unit 3.',c:['Dest']}],m:'W&I level + sửa lại 1 lần.'},
+ {n:19,date:'T6 3/7',ph:1,type:'study',focus:'Listening — full timed',tasks:[{t:'L full test canh 30’.',c:['BC-LIST']},{t:'Sublist 3.',c:['AWL']}],m:'Đúng /40 → quy band. Mục tiêu <b>≥20</b>.'},
+ {n:20,date:'T7 4/7',ph:1,type:'study',focus:'Speaking + tổng kết Phase 1',tasks:[{t:'Buổi #2 (Part 2+3).',c:['italki']},{t:'Tự đánh giá phase 1.',c:[]}],m:'Liệt kê <b>3 dạng câu yếu nhất</b> cho phase 2.'},
+
+ {n:21,date:'CN 5/7',ph:2,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'Ôn Sublist 3.',c:['AWL']},{t:'Nghe 1 TED-Ed có phụ đề.',c:[]}],m:'Nhớ ≥80%.'},
+ {n:22,date:'T2 6/7',ph:2,type:'study',focus:'Listening — đánh dạng yếu nhất',tasks:[{t:'Cam16 Test 1 Section 1+2, canh giờ → mổ lỗi từng câu.',c:['Cam']}],m:'Đúng /20. Ghi lý do mỗi câu sai.'},
+ {n:23,date:'T3 7/7',ph:2,type:'study',focus:'Reading — đánh dạng yếu nhất',tasks:[{t:'Cam16 Test 1 Passage 1, canh 20’.',c:['Cam']}],m:'Đúng /13 → quy band passage.'},
+ {n:24,date:'T4 8/7',ph:2,type:'study',focus:'Writing T2 — đề mới',tasks:[{t:'Lesson #14–16 (essay outlines). Viết Task 2.',c:['SIMON-T2']},{t:'Check.',c:['W&I']}],m:'W&I chạm <b>B1+</b>.'},
+ {n:25,date:'T5 9/7',ph:2,type:'study',focus:'Writing — italki sửa #3',tasks:[{t:'Gửi essay hôm qua cho tutor sửa trước, buổi học mổ lỗi.',c:['italki']}],m:'Band W + 3 lỗi lặp.'},
+ {n:26,date:'T6 10/7',ph:2,type:'study',focus:'L + R timed',tasks:[{t:'Cam16 Test 1 Section 3+4 (L) + Passage 2 (R).',c:['Cam']}],m:'L /20, R /13.'},
+ {n:27,date:'T7 11/7',ph:2,type:'study',focus:'Speaking — topic + italki #4',tasks:[{t:'Đọc Part 3 (chủ đề education/work) lấy ý + từ.',c:['LIZ-SPEAK']},{t:'Buổi #4 (Part 2+3).',c:['italki']}],m:'Dùng được ≥5 từ topic mới.'},
+ {n:28,date:'CN 12/7',ph:2,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'Sublist 4.',c:['AWL']},{t:'Xem 1 lesson Writing bất kỳ.',c:['SIMON-T2']}],m:'Nhớ ≥80%.'},
+
+ {n:29,date:'T2 13/7',ph:2,type:'study',focus:'Reading — full timed',tasks:[{t:'Cam16 Test 2 Reading full, canh 60’.',c:['Cam']}],m:'Đúng /40 → quy band.'},
+ {n:30,date:'T3 14/7',ph:2,type:'mock',mock:'full',focus:'🚩 Full Mock #2',tasks:[{t:'Cam17 Test 1: L+R+W canh giờ thật, làm 1 mạch.',c:['Cam']}],m:'<b>4 band. So thẳng D1.</b> Band đứng yên → ưu tiên cày.'},
+ {n:31,date:'T4 15/7',ph:2,type:'study',focus:'Mổ Mock #2',tasks:[{t:'Phân tích toàn bộ lỗi mock hôm qua. Không học mới.',c:[]}],m:'Bảng: lỗi / nguyên nhân / cách fix.'},
+ {n:32,date:'T5 16/7',ph:2,type:'study',focus:'Writing T1 — nâng',tasks:[{t:'Lesson process/map (mục giữa danh sách). Viết → Check.',c:['SIMON-T1','W&I']}],m:'W&I không tụt so với T2.'},
+ {n:33,date:'T6 17/7',ph:2,type:'study',focus:'Listening — dạng yếu (lại)',tasks:[{t:'Cam17 Test 2 Listening full, canh 30’.',c:['Cam']},{t:'Sublist 5.',c:['AWL']}],m:'Đúng /40, tăng so D19.'},
+ {n:34,date:'T7 18/7',ph:2,type:'study',focus:'Speaking — mock #5',tasks:[{t:'Buổi #5: full speaking mock (Part 1+2+3).',c:['italki']}],m:'Band so D13.'},
+ {n:35,date:'CN 19/7',ph:2,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'Ôn Sublist 4–5.',c:['AWL']},{t:'Nghe.',c:[]}],m:'Nhớ ≥80%.'},
+
+ {n:36,date:'T2 20/7',ph:2,type:'study',focus:'Reading — full timed',tasks:[{t:'Cam17 Test 3 Reading, canh 60’.',c:['Cam']}],m:'Đúng /40, nhắm <b>≥23</b>.'},
+ {n:37,date:'T3 21/7',ph:2,type:'study',focus:'Writing T2 — italki #6',tasks:[{t:'Viết Task 2 đề mới → tutor sửa.',c:['italki']}],m:'Band W +0.5 so D25.'},
+ {n:38,date:'T4 22/7',ph:2,type:'milestone',focus:'🚩 Milestone — review sâu',tasks:[{t:'Nửa buổi: gom lỗi lặp 4 kỹ năng D1→D37 thành 1 trang.',c:[]}],m:'1 trang <b>"lỗi của tao"</b> — kim chỉ nam phase 3.'},
+ {n:39,date:'T5 23/7',ph:2,type:'study',focus:'Listening — full timed',tasks:[{t:'Cam18 Test 1 Listening, canh 30’.',c:['Cam']},{t:'Sublist 6.',c:['AWL']}],m:'Đúng /40, nhắm <b>≥24</b>.'},
+ {n:40,date:'T6 24/7',ph:2,type:'study',focus:'R + Writing T1',tasks:[{t:'Cam18 Test 1 Reading P1+P2.',c:['Cam']},{t:'1 Task 1 → Check.',c:['W&I']}],m:'R /26, W&I giữ B1+.'},
+ {n:41,date:'T7 25/7',ph:2,type:'study',focus:'Speaking — italki #7',tasks:[{t:'Part 2+3, tập trung 3 lỗi từ D34.',c:['italki']}],m:'Sửa ≥2/3 lỗi.'},
+ {n:42,date:'CN 26/7',ph:2,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'Ôn Sublist 6.',c:['AWL']},{t:'Nghe.',c:[]}],m:'Nhớ ≥80%.'},
+
+ {n:43,date:'T2 27/7',ph:2,type:'study',focus:'Reading — full timed',tasks:[{t:'Cam18 Test 2 Reading, canh 60’.',c:['Cam']}],m:'Đúng /40, nhắm ≥24.'},
+ {n:44,date:'T3 28/7',ph:2,type:'study',focus:'Writing T2 — italki #8',tasks:[{t:'Viết → tutor sửa. So 3 essay gần nhất.',c:['italki']}],m:'Lỗi lặp giảm còn ≤2.'},
+ {n:45,date:'T4 29/7',ph:2,type:'mock',mock:'full',focus:'🚩 Full Mock #3',tasks:[{t:'Cam18 Test 3 full L+R+W, canh giờ.',c:['Cam']}],m:'<b>4 band. So D1 & D30.</b> Phải thấy ≥1 kỹ năng chạm 6.0.'},
+
+ {n:46,date:'T5 30/7',ph:3,type:'study',focus:'Mổ Mock #3',tasks:[{t:'Phân tích lỗi mock D45. Cập nhật trang "lỗi của tao".',c:[]}],m:'Lỗi mới phát sinh = 0 mới ổn.'},
+ {n:47,date:'T6 31/7',ph:3,type:'study',focus:'Writing — chốt template',tasks:[{t:'Lesson #30 (best structure). Cố định khung T1 + T2 riêng.',c:['SIMON-T2']}],m:'1 template T1 + 1 T2 viết thuộc.'},
+ {n:48,date:'T7 1/8',ph:3,type:'study',focus:'Speaking — mock #9',tasks:[{t:'Buổi #9: full speaking mock.',c:['italki']}],m:'Band so D34 — nhắm 6.0.'},
+ {n:49,date:'CN 2/8',ph:3,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'Đọc lại trang "lỗi của tao" + 10 từ.',c:[]}],m:'—'},
+ {n:50,date:'T2 3/8',ph:3,type:'mock',mock:'full',focus:'🎯 Full Mock #4',tasks:[{t:'Cam19 Test 1 full (L+R+W), canh giờ 1 mạch.',c:['Cam']}],m:'4 band. Nhắm overall <b>≥5.5–6.0</b>.'},
+ {n:51,date:'T3 4/8',ph:3,type:'study',focus:'Mổ Mock #4',tasks:[{t:'Phân tích, đặc biệt kỹ năng yếu nhất.',c:[]}],m:'Liệt kê 3 việc fix cho tuần cuối.'},
+ {n:52,date:'T4 5/8',ph:3,type:'study',focus:'Cày kỹ năng yếu nhất',tasks:[{t:'Dồn 2h vào band thấp nhất (thường Writing).',c:['W&I','italki']}],m:'Đo lại riêng kỹ năng đó.'},
+ {n:53,date:'T5 6/8',ph:3,type:'study',focus:'L + R — refine',tasks:[{t:'Làm lại 2 section sai nhiều ở mock D50, mổ kỹ.',c:['Cam']}],m:'Đúng tăng so lần đầu.'},
+ {n:54,date:'T6 7/8',ph:3,type:'study',focus:'Writing — chốt lần cuối',tasks:[{t:'1 Task 2 + 1 Task 1 áp template → buổi #10 sửa chốt.',c:['italki']}],m:'Band W ổn định, không tụt.'},
+ {n:55,date:'T7 8/8',ph:3,type:'study',focus:'Speaking — chốt',tasks:[{t:'Buổi #11 mock — luyện trôi, đừng học từ mới.',c:['italki']}],m:'Không khựng quá 3s.'},
+ {n:56,date:'CN 9/8',ph:3,type:'light',focus:'🟢 Ngày nhẹ',tasks:[{t:'Đọc template W + lướt trang "lỗi".',c:[]}],m:'—'},
+
+ {n:57,date:'T2 10/8',ph:3,type:'study',focus:'L + R — nhẹ, giữ phản xạ',tasks:[{t:'1 L full + 1 R passage, không đặt mục tiêu điểm.',c:['BC-LIST','BC-READ']}],m:'Giữ cảm giác, không stress.'},
+ {n:58,date:'T3 11/8',ph:3,type:'mock',mock:'full',focus:'🚩 Mock CUỐI',tasks:[{t:'Cam19 Test 2 full, canh giờ. Mock cuối cùng.',c:['Cam']}],m:'4 band cuối. So toàn bộ chặng.'},
+ {n:59,date:'T4 12/8',ph:3,type:'study',focus:'Logistics + ôn lướt',tasks:[{t:'Xem lại template W + 20 từ chủ đề hay ra. Chuẩn bị giấy tờ thi.',c:[]}],m:'Không học mới. Đầu nhẹ.'},
+ {n:60,date:'T5 13/8',ph:3,type:'light',focus:'🟢 NGHỈ',tasks:[{t:'Ngủ đủ. Lướt Speaking Part 1 cho miệng quen.',c:['LIZ-SP1']}],m:'Vào phòng thi với đầu rỗng-thư giãn.'}
+];
+
+const TYPE_LABEL={study:'Học',light:'Nhẹ',milestone:'Milestone',mock:'Mock'};
+
+/* ---------- band conversion ---------- */
+function bandL(r){r=+r;if(isNaN(r))return null;if(r>=39)return 9;if(r>=37)return 8.5;if(r>=35)return 8;if(r>=32)return 7.5;if(r>=30)return 7;if(r>=26)return 6.5;if(r>=23)return 6;if(r>=18)return 5.5;if(r>=16)return 5;if(r>=13)return 4.5;if(r>=10)return 4;return 3.5;}
+function bandR(r){r=+r;if(isNaN(r))return null;if(r>=39)return 9;if(r>=37)return 8.5;if(r>=35)return 8;if(r>=33)return 7.5;if(r>=30)return 7;if(r>=27)return 6.5;if(r>=23)return 6;if(r>=19)return 5.5;if(r>=15)return 5;if(r>=13)return 4.5;if(r>=10)return 4;return 3.5;}
+function roundBand(x){return Math.round(x*2)/2;}
+
+/* ---------- state ---------- */
+const KEY='ielts60_v2';
+let state={done:{},sub:{},notes:{},mocks:{},min:false};
+function load(){try{const s=localStorage.getItem(KEY);if(s)state=Object.assign(state,JSON.parse(s));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+load();
+if(!state.start){state.start=new Date().toISOString().slice(0,10);save();}
+
+function todayIndex(){const base=new Date(state.start+'T00:00:00');const now=new Date();const diff=Math.floor((now-base)/86400000)+1;return Math.min(60,Math.max(1,diff));}
+let cur=todayIndex();
+const $=id=>document.getElementById(id);
+
+function linkHtml(code){const r=RES[code];if(!r)return'';if(r.note)return `<span class="lnk note">${r.l}</span>`;return `<a class="lnk" href="${r.u}" target="_blank" rel="noopener">${r.l}</a>`;}
+function navHtml(code){const r=RES[code];if(!r||!r.nav)return'';return `<div class="navline"><span class="tag">${r.l}</span><br>${r.nav}</div>`;}
+
+function renderToday(){
+  const d=D[cur-1];
+  $('card').classList.toggle('min',!!state.min);
+  $('dBig').textContent=d.n; $('dDate').textContent=d.date;
+  const ph=$('dPhase'); ph.className='pill phase'+d.ph; ph.textContent='Phase '+d.ph;
+  const ty=$('dType'); ty.className='pill type-'+d.type; ty.textContent=TYPE_LABEL[d.type];
+  $('star').textContent=(d.type==='mock'||d.type==='milestone')?'★':'';
+  $('dFocus').textContent=d.focus; $('dMeasure').innerHTML=d.m;
+
+  const sub=state.sub[d.n]||[];
+  $('dTasks').innerHTML=d.tasks.map((t,i)=>{
+    const on=sub[i]?'on':''; const done=sub[i]?'done':'';
+    const links=t.c.length?`<div class="links">${t.c.map(linkHtml).join('')}</div>`:'';
+    const navs=t.c.length?`<div class="navnote">${t.c.map(navHtml).join('')}</div>`:'';
+    return `<li class="task ${done}"><div class="cb ${on}" data-i="${i}"></div><div class="task-main"><div class="task-txt">${t.t}</div>${links}${navs}</div></li>`;
+  }).join('');
+  $('dTasks').querySelectorAll('.cb').forEach(cb=>cb.onclick=()=>{const i=+cb.dataset.i;const arr=state.sub[d.n]||(state.sub[d.n]=[]);arr[i]=!arr[i];save();renderToday();});
+
+  $('dNotes').value=state.notes[d.n]||'';
+  const slot=$('mockSlot'); slot.innerHTML=''; if(d.mock)slot.appendChild(buildMockPanel(d));
+
+  const isDone=!!state.done[d.n]; const db=$('doneBtn');
+  db.textContent=isDone?'✓ Đã xong ngày này':'Đánh dấu xong ngày'; db.classList.toggle('is-done',isDone);
+  $('minBtn').classList.toggle('on',!!state.min);
+  $('prevBtn').disabled=cur<=1; $('nextBtn').disabled=cur>=60;
+  renderHeader(); renderGrid(); renderMockLog();
+}
+
+function buildMockPanel(d){
+  const m=state.mocks[d.n]||{}; const wrap=document.createElement('div'); wrap.className='mock'; const mini=d.mock==='mini';
+  wrap.innerHTML=`<h4>${d.mock==='diag'?'Nhập điểm diagnostic':mini?'Nhập điểm mini-test':'Nhập điểm mock'}</h4>
+    <div class="mgrid">
+      <div class="mfield"><label>Listening đúng /40</label><input type="number" min="0" max="40" id="mL" value="${m.L??''}"><div class="band" id="bL"></div></div>
+      <div class="mfield"><label>Reading đúng /40</label><input type="number" min="0" max="40" id="mR" value="${m.R??''}"><div class="band" id="bR"></div></div>
+      ${mini?'':`<div class="mfield"><label>Writing band (W&I/italki)</label><input type="number" step="0.5" min="0" max="9" id="mW" value="${m.W??''}"><div class="band"></div></div>
+      <div class="mfield"><label>Speaking band (italki)</label><input type="number" step="0.5" min="0" max="9" id="mS" value="${m.S??''}"><div class="band"></div></div>`}
+    </div>
+    <div class="overall"><span class="l">${mini?'Trung bình L+R':'Overall ước tính'}</span><span class="r" id="mOv">—</span></div>`;
+  setTimeout(()=>{
+    const fields=['mL','mR']; if(!mini)fields.push('mW','mS');
+    const recompute=()=>{
+      const L=$('mL').value,R=$('mR').value; const bl=L!==''?bandL(L):null,br=R!==''?bandR(R):null;
+      $('bL').textContent=bl!=null?'→ band '+bl.toFixed(1):''; $('bR').textContent=br!=null?'→ band '+br.toFixed(1):'';
+      let parts=[bl,br]; if(!mini){const W=$('mW').value,S=$('mS').value;parts=[bl,br,W!==''?+W:null,S!==''?+S:null];}
+      const vals=parts.filter(x=>x!=null&&!isNaN(x)); let ov='—';
+      if(vals.length===(mini?2:4))ov=roundBand(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+      $('mOv').textContent=ov;
+      const obj={L:$('mL').value||null,R:$('mR').value||null}; if(!mini){obj.W=$('mW').value||null;obj.S=$('mS').value||null;}
+      obj.overall=(ov!=='—')?+ov:null; state.mocks[d.n]=obj; save(); renderHeader(); renderMockLog();
+    };
+    fields.forEach(f=>$(f).addEventListener('input',recompute)); recompute();
+  },0);
+  return wrap;
+}
+
+function renderHeader(){
+  const doneCount=Object.values(state.done).filter(Boolean).length; const pct=Math.round(doneCount/60*100);
+  $('ringDone').textContent=doneCount+'/60'; $('ringPct').textContent=pct+'%';
+  const C=2*Math.PI*23; $('ringFill').setAttribute('stroke-dasharray',C.toFixed(1)); $('ringFill').setAttribute('stroke-dashoffset',(C*(1-doneCount/60)).toFixed(1));
+  let maxDone=0; for(let i=1;i<=60;i++)if(state.done[i])maxDone=i;
+  let streak=0; for(let i=maxDone;i>=1;i--){if(state.done[i])streak++;else break;} $('streakNum').textContent=streak;
+  let latest=null,latestN=0; for(let i=1;i<=60;i++){const mk=state.mocks[i];if(mk&&mk.overall!=null){latest=mk.overall;latestN=i;}}
+  if(latest!=null){$('meterVal').textContent='band '+latest.toFixed(1)+' · ngày '+latestN;$('meterFill').style.width=(latest/9*100)+'%';}
+  else{$('meterVal').textContent='— chưa có mock';$('meterFill').style.width='0%';}
+}
+
+function renderGrid(){
+  const g=$('grid');
+  g.innerHTML=D.map(d=>{const done=state.done[d.n]?'done':'';const curC=d.n===cur?'cur':'';const star=(d.type==='mock'||d.type==='milestone')?'<span class="dot">★</span>':'';return `<div class="cell p${d.ph} ${done} ${curC}" data-n="${d.n}">${d.n}${star}</div>`;}).join('');
+  g.querySelectorAll('.cell').forEach(c=>c.onclick=()=>{cur=+c.dataset.n;renderToday();window.scrollTo({top:0,behavior:'smooth'});});
+}
+
+function renderResPanel(){
+  const order=['BC-FULL','BC-LIST','BC-READ','BC-WRITE','BC-L-LE','LIZ-TFNG','LIZ-TFNG-P','LIZ-QTYPES','LIZ-LISTEN','LIZ-LMCQ','LIZ-SP1','LIZ-SP2','LIZ-SPEAK','LIZ-W1','LIZ-W2','SIMON-T1','SIMON-T2','W&I','AWL','italki','ELSA','Cam','Dest'];
+  $('resPanel').innerHTML=order.map(c=>{const r=RES[c];return `<div class="resrow"><div class="rh">${linkHtml(c)}</div><div class="rn">${r.nav}</div></div>`;}).join('');
+}
+
+function renderMockLog(){
+  const log=$('mocklog'),rows=$('mockRows'); const entries=[];
+  for(let i=1;i<=60;i++){const mk=state.mocks[i];if(mk&&(mk.L||mk.R||mk.overall!=null))entries.push({n:i,mk});}
+  if(!entries.length){log.classList.remove('show');return;} log.classList.add('show');
+  rows.innerHTML=entries.map(e=>{
+    const d=D[e.n-1],mk=e.mk;
+    const bl=mk.L?bandL(mk.L).toFixed(1):'–',br=mk.R?bandR(mk.R).toFixed(1):'–',w=mk.W?(+mk.W).toFixed(1):'–',s=mk.S?(+mk.S).toFixed(1):'–';
+    const ov=mk.overall!=null?mk.overall.toFixed(1):'–';
+    const sc=d.mock==='mini'?`L ${bl} · R ${br}`:`L ${bl} · R ${br} · W ${w} · S ${s}`;
+    return `<div class="mrow"><div class="who">Ngày ${e.n}<small>${d.focus.replace(/^[^\w\sÀ-ỹ]+\s*/,'')}</small></div><div class="scores">${sc}</div><div class="ov">${ov}</div></div>`;
+  }).join('');
+}
+
+$('doneBtn').onclick=()=>{const n=D[cur-1].n;state.done[n]=!state.done[n];save();renderToday();};
+$('minBtn').onclick=()=>{state.min=!state.min;save();renderToday();};
+$('prevBtn').onclick=()=>{if(cur>1){cur--;renderToday();}};
+$('nextBtn').onclick=()=>{if(cur<60){cur++;renderToday();}};
+$('todayBtn').onclick=()=>{cur=todayIndex();renderToday();window.scrollTo({top:0,behavior:'smooth'});};
+$('gridToggle').onclick=()=>{const g=$('grid');g.classList.toggle('show');$('gridToggle').textContent=g.classList.contains('show')?'▦ Ẩn lưới 60 ngày':'▦ Xem toàn bộ 60 ngày';};
+$('mapToggle').onclick=()=>{const p=$('resPanel');p.classList.toggle('show');$('mapToggle').textContent=p.classList.contains('show')?'📍 Ẩn bản đồ nguồn':'📍 Bản đồ nguồn — bấm link nào thì làm gì';};
+$('dNotes').addEventListener('input',e=>{state.notes[D[cur-1].n]=e.target.value;save();});
+$('resetBtn').onclick=()=>{if(confirm('Xoá toàn bộ tiến trình? Không khôi phục được.')){state={done:{},sub:{},notes:{},mocks:{},min:false,start:new Date().toISOString().slice(0,10)};save();cur=todayIndex();renderToday();}};
+
+renderResPanel(); renderToday();
+</script>
+</body>
+</html>
